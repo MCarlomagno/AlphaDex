@@ -9,17 +9,17 @@ import './AlphaToken.sol';
 contract Exchange {
     string public name = "AlphaDex";
 
-    mapping(string => IERC20) tokens;
+    mapping(string => IERC20) private _tokens;
 
     event Bought(uint256 amount);
     event Sold(uint256 amount);
 
     constructor() {
-        tokens["ATK"] = new AlphaToken();
+        _tokens["ATK"] = new AlphaToken();
     }
 
-    function buy(string calldata ticker) payable public {
-        IERC20 token = tokens[ticker];
+    function buy(string calldata symbol) payable public {
+        IERC20 token = _tokens[symbol];
         require(token.totalSupply() > 0, "Token not supported");
 
         uint256 amount = msg.value;
@@ -32,10 +32,10 @@ contract Exchange {
         emit Bought(amount);
     }
 
-    function sell(string calldata ticker, uint256 amount) public {
+    function sell(string calldata symbol, uint256 amount) public {
         require(amount > 0, "The amount to sell must be greater than 0");
         
-        IERC20 token = tokens[ticker];
+        IERC20 token = _tokens[symbol];
         require(token.totalSupply() > 0, "Token not supported");
 
         uint256 allowance = token.allowance(msg.sender, address(this));
